@@ -40,7 +40,7 @@ Collect from the router:
 - which logs exist, whether they have timestamps, and what kinds of events they record (summarize, never dump whole logs)
 
 Check from this computer:
-- `scripts/dns-check.sh`: which company answers this computer's DNS lookups
+- `scripts/dns-check.sh`: which company answers this computer's DNS lookups (on Windows without bash: `nslookup whoami.akamai.net`, then `whois` or an online lookup of the address it returns)
 - `traceroute -m 4 1.1.1.1` (`tracert -h 4 1.1.1.1` on Windows): the first hop after the router is the provider's network; `100.64.0.0/10` means carrier-grade NAT
 
 Optional, only if the user says yes: an Android TV / Google TV box on the same network with ADB debugging on. Read per-app network usage with `adb shell dumpsys netstats`, map UIDs to packages with `adb shell cmd package list packages -U`, and point out provider apps that send data while the TV is asleep. Read-only.

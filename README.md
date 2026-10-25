@@ -50,8 +50,8 @@ Encrypted DNS hides your lookups, not which servers you connect to. Only a VPN h
 
 ## It's not just my router
 
-- About 1 billion home devices have the TR-069 remote management channel. Hils & Böhme, University of Innsbruck, "Watching the Weak Link into Your Home", ACNS 2020, [arXiv:2001.02564](https://arxiv.org/abs/2001.02564)
-- Researchers pulled the locations of more than 2 billion routers from Apple's Wi-Fi database, accurate to meters. Rye & Levin, University of Maryland, "Surveilling the Masses with Wi-Fi-Based Positioning Systems", 2024, [arXiv:2405.14975](https://arxiv.org/abs/2405.14975)
+- Nearly 1 billion home devices have the TR-069 remote management channel. Hils & Böhme, University of Innsbruck, "Watching the Weak Link into Your Home", ACNS 2020, [arXiv:2001.02564](https://arxiv.org/abs/2001.02564)
+- Researchers pulled the locations of more than 2 billion routers from Apple's Wi-Fi database, precise enough to find individual homes. Rye & Levin, University of Maryland, "Surveilling the Masses with Wi-Fi-Based Positioning Systems", 2024, [arXiv:2405.14975](https://arxiv.org/abs/2405.14975)
 
 ## What's inside
 
