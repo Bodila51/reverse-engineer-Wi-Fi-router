@@ -28,8 +28,9 @@ const CMP = [
   ['Axeptio', /axept\.io/, '#axeptio_overlay'],
   ['CookieYes', /cookieyes\.com/, '.cky-consent-container'],
 ];
+const CMP_SEL = CMP.map((c) => c[2]).join(',');
+// Loose matches count only for a box that is not most of the page (some sites wrap the whole page in "cookieBanner").
 const BANNER_SEL = [
-  ...CMP.map((c) => c[2]),
   '[id*="cookie" i]',
   '[class*="cookie" i]',
   '[id*="consent" i]',
@@ -52,7 +53,7 @@ const COLLECT = (bannerSel) => {
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
       if (r.width < 4 || r.height < 4 || cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) continue;
-      if (r.bottom < 0 || r.top > innerHeight * 3) continue;
+      if (!['INPUT', 'TEXTAREA'].includes(el.tagName) && (r.bottom < 0 || r.top > innerHeight * 3)) continue;
       const type = (el.getAttribute('type') || '').toLowerCase();
       if (el.tagName === 'INPUT' && ['hidden', 'submit', 'image'].includes(type) && !el.value) continue;
       const text = (el.innerText || el.value || el.getAttribute('aria-label') || el.getAttribute('title') || el.getAttribute('placeholder') || el.getAttribute('alt') || '').replace(/\s+/g, ' ').trim().slice(0, 80);
@@ -62,7 +63,16 @@ const COLLECT = (bannerSel) => {
       try {
         let n = el;
         while (n && !inBanner) {
-          if (n.matches && n.matches(bannerSel)) inBanner = true;
+          if (n.matches && n.matches(bannerSel[0])) inBanner = true;
+          else if (n.matches && n.matches(bannerSel[1]) && n.querySelectorAll('*').length < 600 && n.getBoundingClientRect().height < innerHeight * 0.9) inBanner = true;
+          n = n.parentElement || (n.getRootNode && n.getRootNode().host) || null;
+        }
+        // Unlabelled banners: a fixed or sticky box that talks about cookies or consent.
+        n = el;
+        while (n && !inBanner) {
+          const pos = n.nodeType === 1 ? getComputedStyle(n).position : '';
+          const txt = pos === 'fixed' || pos === 'sticky' ? (n.innerText || '').slice(0, 4000) : '';
+          if (txt && /cookie|consent|einwillig|tracking|traceurs|rastreo/i.test(txt) && /accept|akzept|reject|ablehn|agree|einverstanden|allow|erlauben|essential|notwendig|refuser|rechazar|rifiut/i.test(txt)) inBanner = true;
           n = n.parentElement || (n.getRootNode && n.getRootNode().host) || null;
         }
       } catch (e) {}
@@ -83,10 +93,13 @@ const COLLECT = (bannerSel) => {
     for (const n of root.querySelectorAll('*')) if (n.shadowRoot) walk(n.shadowRoot);
   };
   walk(document);
-  return out;
+  // Banner elements first, then search and email fields, then top to bottom.
+  const rank = (d) => (d.inBanner ? 3 : 0) + (d.isSearch || d.isEmail ? 2 : 0) + (d.typeable ? 1 : 0);
+  out.sort((a, b) => rank(b.d) - rank(a.d) || a.d.y - b.d.y);
+  return out.slice(0, 60);
 };
 
-export async function serve({url, identity, runDir, runId, watch, headed}) {
+export async function serve({url, identity, runDir, runId, watch, headless}) {
   const idn = identities()[identity];
   if (!idn) throw new Error(`unknown identity ${identity}`);
   const dir = path.join(runDir, identity);
@@ -147,7 +160,7 @@ export async function serve({url, identity, runDir, runId, watch, headed}) {
     ctx = browser.contexts()[0] ?? (await browser.newContext());
   } else {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `site-xray-${identity}-`));
-    ctx = await chromium.launchPersistentContext(tmpDir, {channel: 'chrome', headless: !headed, viewport: {width: 1366, height: 860}});
+    ctx = await chromium.launchPersistentContext(tmpDir, {channel: 'chrome', headless: !!headless, viewport: {width: 1366, height: 860}});
   }
 
   // ---- recorders, all attached before the first navigation
@@ -294,9 +307,9 @@ export async function serve({url, identity, runDir, runId, watch, headed}) {
         host = new URL(fr.url()).hostname;
       } catch {}
       try {
-        const arr = await fr.evaluateHandle(COLLECT, BANNER_SEL);
+        const arr = await fr.evaluateHandle(COLLECT, [CMP_SEL, BANNER_SEL]);
         const n = await arr.evaluate((a) => a.length);
-        for (let i = 0; i < n && items.length < 80; i++) {
+        for (let i = 0; i < n && items.length < 120; i++) {
           const pair = await arr.evaluateHandle((a, i) => a[i], i);
           const d = await pair.evaluate((p) => p.d);
           const el = await pair.evaluateHandle((p) => p.el);
@@ -306,8 +319,9 @@ export async function serve({url, identity, runDir, runId, watch, headed}) {
         arr.dispose().catch(() => {});
       } catch {}
     }
-    // Banner elements first, then the rest top to bottom, max 40.
-    items.sort((a, b) => Number(b.d.inBanner) - Number(a.d.inBanner) || a.d.y - b.d.y);
+    // Banner elements first, then search and email fields, then the rest top to bottom, max 40.
+    const rank = (d) => (d.inBanner ? 3 : 0) + (d.isSearch || d.isEmail ? 2 : 0) + (d.typeable ? 1 : 0);
+    items.sort((a, b) => rank(b.d) - rank(a.d) || a.d.y - b.d.y);
     handles = items.slice(0, 40);
     for (const x of items.slice(40)) x.handle.dispose().catch(() => {});
     const platforms = new Set(cap.consentPlatforms);

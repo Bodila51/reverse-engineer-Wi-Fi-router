@@ -2,7 +2,7 @@
 // site-xray: open a website as several real people and see what it collects about each of them.
 //
 //   xray doctor
-//   xray start <url> --as <identity> --run <dir> [--watch] [--headed]
+//   xray start <url> --as <identity> --run <dir> [--watch] [--headless]
 //   xray look      --as <identity> --run <dir>
 //   xray click <i> --as <identity> --run <dir> [--phase <name>]
 //   xray type <i> <text> --as <identity> --run <dir> [--phase <name>]
@@ -98,7 +98,7 @@ switch (cmd) {
     const run = readJson(meta, {runId: runId(), site: url, created: new Date().toISOString()});
     fs.writeFileSync(meta, JSON.stringify(run, null, 2));
     const log = fs.openSync(path.join(idDir, 'visit.log'), 'a');
-    const child = spawn(process.execPath, [fileURLToPath(import.meta.url), '_serve', url, '--as', String(flags.as), '--run', dir, '--runid', run.runId, ...(flags.watch ? ['--watch'] : []), ...(flags.headed ? ['--headed'] : [])], {detached: true, stdio: ['ignore', log, log]});
+    const child = spawn(process.execPath, [fileURLToPath(import.meta.url), '_serve', url, '--as', String(flags.as), '--run', dir, '--runid', run.runId, ...(flags.watch ? ['--watch'] : []), ...(flags.headless ? ['--headless'] : [])], {detached: true, stdio: ['ignore', log, log]});
     child.unref();
     const end = Date.now() + 180000;
     while (Date.now() < end) {
@@ -129,7 +129,7 @@ switch (cmd) {
   }
   case '_serve': {
     const {serve} = await import('./lib/capture.mjs');
-    await serve({url: pos[0], identity: String(flags.as), runDir: String(flags.run), runId: String(flags.runid), watch: !!flags.watch, headed: !!flags.headed}).catch((e) => {
+    await serve({url: pos[0], identity: String(flags.as), runDir: String(flags.run), runId: String(flags.runid), watch: !!flags.watch, headless: !!flags.headless}).catch((e) => {
       console.error(redact(e.stack || e.message));
       process.exit(1);
     });
@@ -145,6 +145,7 @@ switch (cmd) {
     out(await call('type', {i: pos[0], text: pos.slice(1).join(' '), phase: phase()}));
     break;
   case 'goto':
+    if (!pos[0]) fail('goto needs a URL on the same site or a link index from look');
     out(await call('goto', {target: pos[0], phase: phase()}));
     break;
   case 'scroll':

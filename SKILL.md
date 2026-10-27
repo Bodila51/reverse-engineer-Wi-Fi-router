@@ -1,6 +1,6 @@
 ---
 name: reverse-engineer-wifi-router
-description: Reverse-engineer your own home Wi-Fi router from one photo. Two jobs - a read-only privacy check (every device it remembers, what your internet provider can see and reach through TR-069 and DNS, firmware age, logs, how to fix it) and a slow Wi-Fi fix (backup, speed test, fixes only after your yes, chat control). Use when someone asks what their router knows about them, about router privacy or ISP remote access, or says their Wi-Fi is slow.
+description: Reverse-engineer your own home Wi-Fi router from one photo. Two jobs - a read-only privacy check (every device it remembers, what your internet provider can see and reach through TR-069 and DNS, firmware age, logs, how to fix it) and a slow Wi-Fi fix (backup, speed test, fixes only after your yes, chat control). Use when someone asks what their router knows about them, about router privacy or ISP remote access, or says their Wi-Fi is slow. Also checks what a website collects about you and which companies receive it (site-xray).
 ---
 
 # Reverse-engineer your Wi-Fi router
@@ -11,6 +11,7 @@ Pick the job from what they ask:
 - "what does my router know", privacy, provider, TR-069: **Job 1, privacy check** (read-only)
 - slow Wi-Fi, lag, drops, "control my router": **Job 2, fix slow Wi-Fi**
 - not sure: ask which one, or do Job 1 first
+- what a website collects about you, who it shares data with, whether "Reject all" works: **Job 3, site X-ray**. Read `site-xray/SKILL.md` and follow it
 
 ## Rules for both jobs
 

@@ -8,6 +8,9 @@ import {ROOT, identities, readJson, writeJson} from './util.mjs';
 
 const TRACKING = new Set(['advertising', 'analytics', 'session recording', 'social', 'fingerprinting or bot protection']);
 const ADLIKE = new Set(['advertising', 'analytics', 'session recording', 'social']);
+// Most telling role wins when one company shows up under several.
+const RANK = ['unknown', 'other', 'cdn or hosting', 'payments', 'customer support', 'consent platform', 'tag manager', 'fingerprinting or bot protection', 'social', 'analytics', 'session recording', 'advertising'];
+const TITLE_PARAM = /^(dt|tl|title|page_title|pt|t)$|\.title$/i;
 const CONSENT_PARAM = /^(gdpr_consent|gdpr_pd|gpp|gpp_sid|addtl_consent|us_privacy|consent|tcf|euconsent|euconsent-v2|_body)$/i;
 const SESSION_REC = /(^|\.)(clarity\.ms|hotjar\.(com|io)|fullstory\.com|smartlook\.(com|cloud)|mouseflow\.com|logrocket\.(com|io)|lr-ingest\.io|contentsquare\.net|contentsquare\.com|quantummetric\.com|inspectlet\.com|luckyorange\.(com|net)|crazyegg\.com)$/;
 const WEBVISOR = /mc\.yandex\.(ru|com)\/webvisor/;
@@ -131,6 +134,9 @@ export async function analyze(runDir) {
   const carriesId = (r) => {
     if (cookieNames(r).length) return true;
     const ps = params(r);
+    // Google consent mode with storage denied: a ping with no cookies, only a temporary ID.
+    const gcs = ps.find(([k]) => k === 'gcs')?.[1];
+    if (gcs && /^G10[01]$/.test(gcs) && /google|doubleclick/.test(hostOf(r.url))) return false;
     return ps.some(([k, v]) => /^(cid|uid|fbp|fbc|_fbp|guid|tdid|mid|vid|uuid|ttp|anonymous_id|user_id|userId|client_id|gclid|sid)$|\.anonymous_id$|\.ttp$/i.test(k) && v && v.length >= 6);
   };
 
@@ -151,6 +157,7 @@ export async function analyze(runDir) {
       const host = hostOf(r.url);
       const w = who(host);
       const c = (companies[w.name] ||= {name: w.name, category: w.category, hq: w.hq, hqSource: w.hqSource || null, domains: new Set(), people: {}, received: new Set(), requests: 0});
+      if (RANK.indexOf(w.category) > RANK.indexOf(c.category)) c.category = w.category;
       c.domains.add(w.domain);
       c.requests++;
       const p = (c.people[v.identity] ||= {requests: 0, beforeConsent: 0, afterConsent: 0, first: r.id});
@@ -200,8 +207,24 @@ export async function analyze(runDir) {
     // 3. search word leak
     if (typedSearch && v.searchWord) {
       const w = v.searchWord;
-      const forms = uniq([w, encodeURIComponent(w), w.replace(/ /g, '+')]);
-      const hits = third.filter((r) => r.t >= typedSearch.t && forms.some((f) => r.url.includes(f) || (r.post && r.post.includes(f))));
+      const forms = uniq([w, encodeURIComponent(w), w.replace(/ /g, '+')]).map((f) => f.toLowerCase());
+      // A page address that only has the word in its path (a category page) is not a leak of what was typed.
+      const leaks = (val) => {
+        const v = String(val).toLowerCase();
+        if (!forms.some((f) => v.includes(f))) return false;
+        if (/^https?:\/\//.test(v)) {
+          try {
+            const q = new URL(val).search.toLowerCase();
+            return forms.some((f) => q.includes(f));
+          } catch {
+            return false;
+          }
+        }
+        return true;
+      };
+      // Not a leak when the word was already there before anything was typed (a page title, a menu).
+      const before = new Set(third.filter((r) => r.t < typedSearch.t).flatMap((r) => params(r).filter(([, val]) => leaks(val)).map(([k]) => k)));
+      const hits = third.filter((r) => r.t >= typedSearch.t && params(r).some(([k, val]) => !TITLE_PARAM.test(k) && !before.has(k) && leaks(val)));
       if (hits.length) checks.push({check: 'search-leak', identity: v.identity, word: w, companies: uniq(hits.map((r) => who(hostOf(r.url)).name)), count: hits.length, evidence: hits.slice(0, 30).map((r) => ev(v, r)), summary: `The search word "${w}" was sent to ${uniq(hits.map((r) => who(hostOf(r.url)).name)).join(', ')}.`});
     }
 
@@ -265,7 +288,7 @@ export async function analyze(runDir) {
         }
       }
     }
-    if (syncs.size) checks.push({check: 'id-sync', identity: v.identity, pairs: [...syncs.values()], companies: uniq([...syncs.values()].flatMap((s) => [s.from, s.to])), count: syncs.size, evidence: [...syncs.values()].flatMap((s) => s.evidence), summary: `${syncs.size} times an ID set by one company showed up in a request to a different company.`});
+    if (syncs.size) checks.push({check: 'id-sync', identity: v.identity, pairs: [...syncs.values()], companies: uniq([...syncs.values()].flatMap((s) => [s.from, s.to])), count: syncs.size, evidence: [...syncs.values()].flatMap((s) => s.evidence), summary: `${syncs.size} times an ID set by one company showed up in a request to a different company (${[...syncs.values()].slice(0, 3).map((x) => `${x.from} to ${x.to}`).join(', ')}${syncs.size > 3 ? '…' : ''}).`});
 
     // 6. session recording
     const rec = third.filter((r) => SESSION_REC.test(hostOf(r.url)) || WEBVISOR.test(r.url) || who(hostOf(r.url)).category === 'session recording');
@@ -286,14 +309,14 @@ export async function analyze(runDir) {
       const w = who(hostOf(f.script));
       fp.push({technique: hit, script: f.script.slice(0, 200), company: w.name, category: w.category, phase: f.phase, t: f.t, label: ADLIKE.has(w.category) ? 'tracking by fingerprint' : 'fingerprinting (can also be bot protection)'});
     }
-    if (fp.length) checks.push({check: 'fingerprinting', identity: v.identity, scripts: dedupe(fp, (x) => x.technique + x.script), companies: uniq(fp.map((x) => x.company)), count: fp.length, evidence: [], summary: `${uniq(fp.map((x) => x.script)).length} scripts read device fingerprints: ${uniq(fp.map((x) => x.technique)).join(', ')}.`});
+    if (fp.length) checks.push({check: 'fingerprinting', identity: v.identity, scripts: dedupe(fp, (x) => x.technique + x.script), companies: uniq(fp.map((x) => x.company)), count: fp.length, evidence: [], summary: `${uniq(fp.map((x) => x.script)).length} ${uniq(fp.map((x) => x.script)).length === 1 ? 'script reads' : 'scripts read'} device fingerprints: ${uniq(fp.map((x) => x.technique)).join(', ')}.`});
 
     // 8. per person
     const trackingCos = uniq(third.filter((r) => TRACKING.has(who(hostOf(r.url)).category)).map((r) => who(hostOf(r.url)).name));
     const allCos = uniq(third.map((r) => who(hostOf(r.url)).name));
     const lifetimes = v.cookies.map((c) => (c.expires > 0 ? (c.expires * 1000 - Date.parse(v.endedAt)) / 864e5 : 0));
     people[v.identity] = {
-      label: v.label || idn.label,
+      label: `${String(v.label || idn.label || v.identity).replace(/,\s*clicked.*$/i, '')}, ${clicked === 'nothing' ? (v.bannerSeen ? 'clicked nothing' : 'no banner') : `clicked ${clicked === 'reject' ? 'Reject' : 'Accept'}`}`,
       mode: v.mode,
       device: v.device,
       country: v.country,
@@ -306,7 +329,7 @@ export async function analyze(runDir) {
       companies: allCos.length,
       trackingCompanies: trackingCos.length,
       trackingCompanyNames: trackingCos,
-      beforeConsentCompanies: tc != null ? uniq(third.filter((r) => r.t < tc && ADLIKE.has(who(hostOf(r.url)).category)).map((r) => who(hostOf(r.url)).name)).length : null,
+      beforeConsentCompanies: tc != null && v.bannerSeen ? uniq(third.filter((r) => r.t < tc && ADLIKE.has(who(hostOf(r.url)).category)).map((r) => who(hostOf(r.url)).name)).length : null,
       cookies: v.cookies.length,
       thirdPartyCookies: v.cookies.filter((c) => !who(c.domain.replace(/^\./, '')).firstParty).length,
       longestCookieDays: lifetimes.length ? Math.round(Math.max(...lifetimes)) : 0,
