@@ -44,7 +44,7 @@ async function api(method, route, body, {ok404 = false} = {}) {
     data = text;
   }
   if (!res.ok && !(ok404 && res.status === 404)) {
-    const msg = typeof data === 'object' && data ? data.message || data.error || JSON.stringify(data).slice(0, 200) : String(data).slice(0, 200);
+    const msg = typeof data === 'object' && data ? (typeof data.message === 'string' ? data.message : JSON.stringify(data.message || data.error || data).slice(0, 300)) : String(data).slice(0, 200);
     throw new Error(`Gologin ${method} ${redact(route)} -> ${res.status}: ${redact(msg)}`);
   }
   return {status: res.status, data};
@@ -59,7 +59,7 @@ export async function traffic() {
   return {usedBytes: r.trafficUsedBytes ?? null, limitBytes: r.trafficLimitBytes ?? null};
 }
 
-export async function createProfile({name, os, country}) {
+export async function createProfile({name, os, country, language}) {
   const {data} = await api('POST', '/browser/custom', {name, notes: '', os});
   const id = data?.id;
   if (!id) throw new Error('Gologin did not return a profile id');
@@ -71,6 +71,17 @@ export async function createProfile({name, os, country}) {
     updateAllProfiles: false,
     testOrbita: false,
   }).catch(() => {});
+  // Browser language: read the profile, change only the language, write it back.
+  if (language) {
+    try {
+      const {data: prof} = await api('GET', `/browser/${id}`);
+      prof.autoLang = false;
+      prof.navigator = {...(prof.navigator || {}), language: `${language},${language.split('-')[0]};q=0.9`};
+      await api('PUT', `/browser/${id}`, prof);
+    } catch (e) {
+      // Not fatal: the visit records navigator.language, so a mismatch shows up in the capture.
+    }
+  }
   if (country) {
     try {
       await api('POST', '/users-proxies/mobile-proxy', {countryCode: country, isDc: false, isMobile: false, profileIdToLink: id});

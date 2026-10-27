@@ -142,7 +142,7 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
   let browser, ctx, tmpDir, profileId;
   if (idn.mode === 'gologin') {
     const name = `site-xray-${identity}-${runId}`;
-    profileId = await gl.createProfile({name, os: idn.os, country: idn.country});
+    profileId = await gl.createProfile({name, os: idn.os, country: idn.country, language: idn.language});
     cap.gologin = {profile: name, sessionStart: new Date().toISOString()};
     const pf = await gl.preflight(profileId);
     cap.gologin.preflight = pf.status;
@@ -308,6 +308,9 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
   }
   await settle();
   const firstShot = await screenshot('first-load');
+  try {
+    cap.browser = await page.evaluate(() => ({language: navigator.language, languages: navigator.languages, webdriver: navigator.webdriver, platform: navigator.platform, mobile: navigator.userAgentData ? navigator.userAgentData.mobile : null, screen: `${screen.width}x${screen.height}`}));
+  } catch {}
   try {
     const body = await page.evaluate(() => (document.body?.innerText || '').slice(0, 3000).toLowerCase());
     if (/access denied|attention required|verify you are human|are you a robot|unusual traffic|request blocked|captcha|pardon our interruption/.test(body) && body.length < 2500) cap.blocked = true;
