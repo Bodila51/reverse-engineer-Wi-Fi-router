@@ -370,6 +370,7 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
     async click({i, phase}) {
       const h = pick(i);
       if (h.d.href && cap.pageViews >= MAX_PAGES) throw new Error('page view limit reached (5)');
+      if (/subscri|abonn|\bpay\b|purchase|buy|kaufen|€|£|\$/i.test(h.d.text)) throw new Error('that button leads to a payment or subscription: note "pay or accept" and click nothing');
       setPhase(phase);
       const before = page.url();
       cap.actions.push({t: t(), kind: 'click', text: h.d.text, inBanner: h.d.inBanner, phase: cap.phase});
