@@ -140,7 +140,7 @@ export async function analyze(runDir) {
     const gcs = ps.find(([k]) => k === 'gcs')?.[1];
     if (gcs && /^G10[01]$/.test(gcs) && /google|doubleclick/.test(hostOf(r.url))) return false;
     // An ID parameter counts only when it follows you: the same value repeats, or it is stored in a cookie or storage.
-    return ps.some(([k, v]) => /^(cid|uid|fbp|fbc|_fbp|guid|tdid|mid|vid|uuid|ttp|anonymous_id|user_id|userId|client_id|gclid|sid)$|\.anonymous_id$|\.ttp$|afWebUserId$|customUserId$/i.test(k) && v && v.length >= 6 && !/^[0\-.:]+$/.test(v) && !/^(null|undefined|none|false|0)$/i.test(v) && persistent(v));
+    return ps.some(([k, v]) => /^(cid|uid|fbp|fbc|_fbp|guid|tdid|mid|vid|uuid|ttp|anonymous_id|user_id|userId|client_id|gclid|sid)$|\.anonymous_id$|\.ttp$|afWebUserId$|customUserId$|(^|\.)\$?(device_?id|anonymous_?id|anonymousId|distinct_id|user_?id|userId|visitor_?id|user_pseudo_id|sid22|session_?id)$/i.test(k) && v && v.length >= 6 && !/^[0\-.:]+$/.test(v) && !/^(null|undefined|none|false|0)$/i.test(v) && persistent(v));
   };
   let persistent = () => true;
 
@@ -155,9 +155,10 @@ export async function analyze(runDir) {
     const clicked = consentClick ? (consentClick.phase.startsWith('after-reject') ? 'reject' : 'accept') : 'nothing';
     const typedSearch = v.actions.find((a) => a.kind === 'type' && a.isSearch);
     const typedCanary = v.actions.find((a) => a.kind === 'type' && a.text && a.text.includes('@example.com'));
+    // Requests the browser cancelled (no response) are not counted as delivered.
     const third = v.requests.filter((r) => {
       const h = hostOf(r.url);
-      return h && !who(h).firstParty && !/^(data|blob|chrome-extension):/.test(r.url);
+      return h && !who(h).firstParty && !/^(data|blob|chrome-extension):/.test(r.url) && !(r.failed && !r.status);
     });
 
     // per company: what it received, from whom
