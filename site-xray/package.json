@@ -1,7 +1,7 @@
 {
   "name": "site-xray",
   "version": "1.0.0",
-  "description": "Open a website as several real people and see what it collects about each of them and which companies receive it.",
+  "description": "Open a website as different visitors and see what it collects about each of them and which companies receive it.",
   "license": "MIT",
   "type": "module",
   "private": true,

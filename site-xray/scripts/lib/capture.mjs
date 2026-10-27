@@ -158,6 +158,17 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
     }
     browser = await chromium.connectOverCDP(gl.connectUrl(profileId), {timeout: 90000});
     ctx = browser.contexts()[0] ?? (await browser.newContext());
+    // Which country the site will see. Only the country code is kept, never the IP.
+    try {
+      const probe = await ctx.newPage();
+      await probe.goto('https://www.cloudflare.com/cdn-cgi/trace', {timeout: 30000});
+      const loc = /^loc=(\w+)$/m.exec(await probe.evaluate(() => document.body.innerText))?.[1];
+      cap.gologin.exitCountry = loc ? loc.toLowerCase() : null;
+      if (idn.country && loc && loc.toLowerCase() !== idn.country) cap.problems.push(`exit country is ${loc}, expected ${idn.country.toUpperCase()}`);
+      await probe.close();
+    } catch (e) {
+      cap.problems.push(`country check: ${redact(e.message.split('\n')[0])}`);
+    }
   } else {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `site-xray-${identity}-`));
     ctx = await chromium.launchPersistentContext(tmpDir, {channel: 'chrome', headless: !!headless, viewport: {width: 1366, height: 860}});
@@ -410,6 +421,30 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
       await settle(2000, 12000);
       return {ok: true, screenshot: await screenshot('scroll')};
     },
+    // Smoke test only: does asking for a Live View link disturb the running CDP session?
+    async liveviewcheck() {
+      if (!profileId) throw new Error('Live View exists only for Gologin visits');
+      writeJson(path.join(dir, 'capture.partial.json'), {requests: cap.requests.length});
+      const out = {};
+      try {
+        const url = await gl.liveView(profileId);
+        out.linkReturned = !!url;
+        if (url) {
+          const res = await fetch(url, {signal: AbortSignal.timeout(15000)}).catch(() => null);
+          out.linkStatus = res ? res.status : 'no answer';
+        }
+      } catch (e) {
+        out.error = redact(e.message);
+      }
+      try {
+        out.evaluate = await page.evaluate(() => document.readyState);
+        await page.goto(page.url(), {waitUntil: 'domcontentloaded', timeout: 30000});
+        out.cdpAfter = 'yes';
+      } catch (e) {
+        out.cdpAfter = `no: ${redact(e.message.split('\n')[0])}`;
+      }
+      return out;
+    },
     async stop() {
       setPhase('end');
       try {
@@ -443,6 +478,7 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
         await (browser ? browser.close() : ctx.close());
       } catch {}
       if (profileId) {
+        cap.gologin.usageBeforeEnd = await gl.usage(profileId);
         await gl.endSession(profileId);
         cap.gologin.usage = await gl.usage(profileId);
         cap.gologin.sessionEnd = new Date().toISOString();

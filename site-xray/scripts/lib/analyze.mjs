@@ -259,7 +259,7 @@ export async function analyze(runDir) {
         count: hits.length + wsHits.length,
         evidence: hits.slice(0, 30).map((h) => ev(v, h.r, {canaryForm: h.form})),
         websockets: wsHits.slice(0, 10),
-        summary: hits.length + wsHits.length ? `An email address that was typed but never sent with the form reached ${uniq(hits.map((h) => who(hostOf(h.r.url)).name)).join(', ')} (${uniq(hits.map((h) => h.form)).join(', ')}).` : 'The typed email (never submitted) did not show up in any third-party request.',
+        summary: hits.length + wsHits.length ? `An email address that was typed but never submitted reached ${uniq(hits.map((h) => who(hostOf(h.r.url)).name)).join(', ')} (${uniq(hits.map((h) => h.form)).join(', ')}).` : 'The typed email (never submitted) did not show up in any third-party request.',
       });
     }
 

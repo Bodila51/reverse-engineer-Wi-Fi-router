@@ -22,7 +22,7 @@ export function token() {
 
 const need = () => {
   const t = token();
-  if (!t) throw new Error('No Gologin token. Save it with: security add-generic-password -a "$USER" -s GOLOGIN_TOKEN -w');
+  if (!t) throw new Error('No Gologin token. Copy it from your Gologin dashboard, then save it from the clipboard: security add-generic-password -U -a "$USER" -s GOLOGIN_TOKEN -w "$(pbpaste)" && pbcopy < /dev/null');
   return t;
 };
 

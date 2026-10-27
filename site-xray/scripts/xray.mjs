@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// site-xray: open a website as several real people and see what it collects about each of them.
+// site-xray: open a website as different visitors and see what it collects about each of them.
 //
 //   xray doctor
 //   xray start <url> --as <identity> --run <dir> [--watch] [--headless]
@@ -147,6 +147,9 @@ switch (cmd) {
   case 'goto':
     if (!pos[0]) fail('goto needs a URL on the same site or a link index from look');
     out(await call('goto', {target: pos[0], phase: phase()}));
+    break;
+  case '_liveview-check':
+    out(await call('liveviewcheck'));
     break;
   case 'scroll':
     out(await call('scroll', {phase: phase()}));

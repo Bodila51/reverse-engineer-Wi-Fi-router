@@ -1,6 +1,6 @@
 ---
 name: site-xray
-description: Open a public website as several different real people (a German laptop, an American laptop, a British phone, or just you) and show what the site collects about each of them and which companies receive it - before any click, after "Reject all", the search word, a typed email that was never sent, IDs shared between ad companies, session recording and device fingerprinting. A team of agents does it - Haiku scouts visit, Sonnet analyses, Opus checks every claim - with a cost table at the end. Use when someone asks what a website collects, who it shares data with, whether "Reject all" works, or wants a privacy check of a site.
+description: Open a public website as different visitors (a German laptop, an American laptop, a British phone, or just you) and show what the site collects about each of them and which companies receive it - before any click, after "Reject all", the search word, a typed email that was never submitted, IDs shared between ad companies, session recording and device fingerprinting. A team of agents does it - Haiku scouts visit, Sonnet analyses, Opus checks every claim - with a cost table at the end. Use when someone asks what a website collects, who it shares data with, whether "Reject all" works, or wants a privacy check of a site.
 ---
 
 # Site X-ray

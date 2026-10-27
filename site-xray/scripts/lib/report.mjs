@@ -39,7 +39,7 @@ export async function report(runDir) {
     ['after you clicked Reject', afterRej.length ? maxOf(afterRej, (c) => c.companies.length) : pick('after-reject').length || people.some(([, p]) => p.clicked === 'reject') ? 0 : '–', 'companies that still got an ID or cookies'],
     ['session recording', rec.length ? 'yes' : 'no', rec.length ? [...new Set(rec.flatMap((c) => c.companies))].join(', ') : 'no recording scripts seen'],
     ['fingerprinting scripts', fp.length ? new Set(fp.flatMap((c) => c.scripts.map((s) => s.script))).size : 0, 'scripts that read your device fingerprint'],
-    ['typed email (never sent)', canary.length ? (canary.some((c) => c.leaked) ? 'leaked' : 'stayed') : 'not tested', canary.some((c) => c.leaked) ? [...new Set(canary.flatMap((c) => c.companies))].join(', ') : 'checked as text and as md5, sha1, sha256'],
+    ['typed email (never submitted)', canary.length ? (canary.some((c) => c.leaked) ? 'leaked' : 'stayed') : 'not tested', canary.some((c) => c.leaked) ? [...new Set(canary.flatMap((c) => c.companies))].join(', ') : 'checked as text and as md5, sha1, sha256'],
   ];
 
   const headlines = (fin?.headlines || []).filter((h) => h.status !== 'dropped');
@@ -114,7 +114,7 @@ ${ownerFix.length ? `<h2>What the site owner should fix</h2><ol>${ownerFix.map((
 
 ${cost ? `<h2>What this check cost</h2><div class="scroll"><table><tr><th>Agent</th><th>Model</th><th>Job</th><th>Minutes</th><th>Tokens in / out</th><th>${esc('API price')}</th></tr>
 ${cost.agents.map((a) => `<tr><td>${esc(a.agent)}</td><td>${esc(a.model)}</td><td>${esc(a.job)}</td><td>${n(a.minutes)}</td><td>${n(a.tokens.input + a.tokens.cacheWrite + a.tokens.cacheRead)} / ${n(a.tokens.output)}</td><td>${usd(a.usd)}</td></tr>`).join('')}
-<tr><td>Gologin Cloud Browser</td><td>${n(cost.browser.sessions)} sessions</td><td>real browsers in 3 countries</td><td>${n(cost.browser.minutes)}</td><td>${n(cost.browser.mb)} MB</td><td>${usd(cost.browser.usd)}</td></tr>
+<tr><td>Gologin Cloud Browser</td><td>${n(cost.browser.sessions)} sessions</td><td>browsers for the visitors</td><td>${n(cost.browser.minutes)}</td><td>${n(cost.browser.mb)} MB</td><td>${usd(cost.browser.usd)}</td></tr>
 <tr><th>Total</th><th></th><th></th><th>${n(cost.total.minutes)}</th><th></th><th>${usd(cost.total.usd)}</th></tr></table></div>
 <p class="sub">${esc(cost.priceLabel)}. ${esc(cost.notes.join(' '))}</p>` : ''}
 

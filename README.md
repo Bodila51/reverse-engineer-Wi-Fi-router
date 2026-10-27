@@ -9,7 +9,7 @@ No router manual, no tutorials. Your own network only, no exploits, no password 
 
 ## New: Site X-ray
 
-A team of agents (Haiku, Sonnet, Opus) opens a public website as different real people, a German laptop, an American laptop and a British phone, and shows what the site collects about each of them and which companies receive it. Details: [site-xray/README.md](site-xray/README.md)
+A team of agents (Haiku, Sonnet, Opus) opens a public website as three different visitors: a German laptop, an American laptop and a British phone, and shows what the site collects about each of them and which companies receive it. Details: [site-xray/README.md](site-xray/README.md)
 
 ```bash
 git clone https://github.com/Bodila51/reverse-engineer-Wi-Fi-router /tmp/re && cp -R /tmp/re/site-xray ~/.claude/skills/site-xray && cd ~/.claude/skills/site-xray && npm install
