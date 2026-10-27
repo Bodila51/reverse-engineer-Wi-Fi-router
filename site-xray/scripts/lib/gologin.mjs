@@ -8,6 +8,9 @@ const API = 'https://api.gologin.com';
 const CLOUD = 'https://cloudbrowser.gologin.com';
 const LEDGER = path.join(CACHE, 'profiles.json');
 
+// A Gologin API token is a JWT: starts with eyJ and has two dots.
+export const tokenLooksRight = (t) => !!t && t.startsWith('eyJ') && (t.match(/\./g) || []).length === 2;
+
 export function token() {
   if (process.env.GOLOGIN_TOKEN) return process.env.GOLOGIN_TOKEN.trim();
   try {
@@ -22,7 +25,7 @@ export function token() {
 
 const need = () => {
   const t = token();
-  if (!t) throw new Error('No Gologin token. Copy it from your Gologin dashboard, then save it from the clipboard: security add-generic-password -U -a "$USER" -s GOLOGIN_TOKEN -w "$(pbpaste)" && pbcopy < /dev/null');
+  if (!t) throw new Error('No Gologin token. Copy it from your Gologin dashboard (API section), then run in Terminal: echo "Copy your Gologin token, come back here and press Enter"; read x; t="$(pbpaste)"; case "$t" in eyJ*) security add-generic-password -U -a "$USER" -s GOLOGIN_TOKEN -w "$t" && pbcopy < /dev/null && echo ok;; *) echo "The clipboard does not hold a Gologin token, try again";; esac');
   return t;
 };
 

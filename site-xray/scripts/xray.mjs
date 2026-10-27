@@ -71,7 +71,8 @@ switch (cmd) {
     const chrome = ['/Applications/Google Chrome.app', 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable'];
     r.chrome = chrome.some((p) => fs.existsSync(p)) ? 'found' : 'not found (local mode needs Google Chrome)';
     const gl = await import('./lib/gologin.mjs');
-    r.gologinToken = gl.token() ? 'yes' : 'no';
+    const tk = gl.token();
+    r.gologinToken = !tk ? 'no' : gl.tokenLooksRight(tk) ? 'yes' : 'token looks wrong, save it again (see README)';
     if (r.gologinToken === 'yes') {
       try {
         const tr = await gl.traffic();

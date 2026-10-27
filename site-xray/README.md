@@ -26,13 +26,13 @@ git clone https://github.com/Bodila51/reverse-engineer-Wi-Fi-router /tmp/re && c
 
 Needs Node 20+ and Google Chrome.
 
-For the different people, save your Gologin API token (from the API section of your Gologin dashboard) in your system password store. Copy the token, then on a Mac:
+For the different visitors, save your Gologin API token (from the API section of your Gologin dashboard) in your system password store. On a Mac, run this in Terminal first:
 
 ```bash
-security add-generic-password -U -a "$USER" -s GOLOGIN_TOKEN -w "$(pbpaste)" && pbcopy < /dev/null && echo ok
+echo "Copy your Gologin token, come back here and press Enter"; read x; t="$(pbpaste)"; case "$t" in eyJ*) security add-generic-password -U -a "$USER" -s GOLOGIN_TOKEN -w "$t" && pbcopy < /dev/null && echo ok;; *) echo "The clipboard does not hold a Gologin token, try again";; esac
 ```
 
-It reads the token straight from the clipboard and then clears the clipboard. Don't type it at the `-w` prompt: that prompt keeps only the first 128 characters, and Gologin tokens are longer. On Windows or Linux, set the `GOLOGIN_TOKEN` environment variable instead. The token never goes into the chat.
+It waits for Enter so that copying this command doesn't overwrite the token you copy next, then checks that the clipboard holds a token, saves it and clears the clipboard. Don't type the token at a bare `-w` prompt: that prompt keeps only the first 128 characters, and Gologin tokens are longer. On Windows or Linux, set the `GOLOGIN_TOKEN` environment variable instead. The token never goes into the chat.
 
 Then ask Claude Code:
 
