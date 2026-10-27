@@ -62,5 +62,15 @@
     "language": "ru-RU",
     "consent": "reject",
     "label": "Bulgarian laptop, clicked Reject"
+  },
+  "bg-reject-2": {
+    "mode": "gologin",
+    "os": "win",
+    "device": "Windows laptop",
+    "country": "bg",
+    "language": "ru-RU",
+    "consent": "reject",
+    "label": "Bulgarian laptop, repeat run",
+    "repeat_of": "bg-reject"
   }
 }

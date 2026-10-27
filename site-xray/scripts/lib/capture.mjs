@@ -42,7 +42,9 @@ const BANNER_SEL = [
 ].join(',');
 
 // Runs inside each frame: visible clickable or typeable elements, also inside open shadow roots.
-const COLLECT = (bannerSel) => {
+const COLLECT = ([cmpSel, looseSel, find]) => {
+  const bannerSel = [cmpSel, looseSel];
+  const findRe = find ? new RegExp(find, 'i') : null;
   const out = [];
   const seen = new Set();
   const walk = (root) => {
@@ -53,7 +55,7 @@ const COLLECT = (bannerSel) => {
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
       if (r.width < 4 || r.height < 4 || cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) continue;
-      if (!['INPUT', 'TEXTAREA'].includes(el.tagName) && (r.bottom < 0 || r.top > innerHeight * 3)) continue;
+      if (!findRe && !['INPUT', 'TEXTAREA'].includes(el.tagName) && (r.bottom < 0 || r.top > innerHeight * 3)) continue;
       const type = (el.getAttribute('type') || '').toLowerCase();
       if (el.tagName === 'INPUT' && ['hidden', 'submit', 'image'].includes(type) && !el.value) continue;
       const text = (el.innerText || el.value || el.getAttribute('aria-label') || el.getAttribute('title') || el.getAttribute('placeholder') || el.getAttribute('alt') || '').replace(/\s+/g, ' ').trim().slice(0, 80);
@@ -76,6 +78,7 @@ const COLLECT = (bannerSel) => {
           n = n.parentElement || (n.getRootNode && n.getRootNode().host) || null;
         }
       } catch (e) {}
+      if (findRe && !findRe.test(text)) continue;
       out.push({
         el,
         d: {
@@ -318,7 +321,7 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
 
   // ---- command handlers
   let handles = [];
-  const look = async () => {
+  const look = async ({find} = {}) => {
     for (const h of handles) h.handle.dispose().catch(() => {});
     handles = [];
     const items = [];
@@ -328,7 +331,7 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
         host = new URL(fr.url()).hostname;
       } catch {}
       try {
-        const arr = await fr.evaluateHandle(COLLECT, [CMP_SEL, BANNER_SEL]);
+        const arr = await fr.evaluateHandle(COLLECT, [CMP_SEL, BANNER_SEL, find || null]);
         const n = await arr.evaluate((a) => a.length);
         for (let i = 0; i < n && items.length < 120; i++) {
           const pair = await arr.evaluateHandle((a, i) => a[i], i);

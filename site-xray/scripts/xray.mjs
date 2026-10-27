@@ -3,7 +3,7 @@
 //
 //   xray doctor
 //   xray start <url> --as <identity> --run <dir> [--watch] [--headless]
-//   xray look      --as <identity> --run <dir>
+//   xray look      --as <identity> --run <dir> [--find <text>]
 //   xray click <i> --as <identity> --run <dir> [--phase <name>]
 //   xray type <i> <text> --as <identity> --run <dir> [--phase <name>]
 //   xray goto <url|link index> --as <identity> --run <dir> [--phase <name>]
@@ -137,7 +137,7 @@ switch (cmd) {
     break;
   }
   case 'look':
-    out(await call('look'));
+    out(await call('look', flags.find ? {find: String(flags.find)} : {}));
     break;
   case 'click':
     out(await call('click', {i: pos[0], phase: phase()}));
