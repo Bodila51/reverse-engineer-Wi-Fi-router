@@ -388,7 +388,13 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
       const before = page.url();
       cap.actions.push({t: t(), kind: 'click', text: h.d.text, inBanner: h.d.inBanner, phase: cap.phase});
       await h.handle.scrollIntoViewIfNeeded({timeout: 5000}).catch(() => {});
-      await h.handle.click({timeout: 10000}).catch(async () => h.handle.evaluate((el) => el.click()));
+      // A consent banner often removes its own frame on click: "target closed" then means the click went through.
+      await h.handle.click({timeout: 10000}).catch(async (e) => {
+        if (/closed|detached/i.test(e.message)) return;
+        await h.handle.evaluate((el) => el.click()).catch((e2) => {
+          if (!/closed|detached/i.test(e2.message)) throw e2;
+        });
+      });
       await settle();
       await navigated(before);
       return {ok: true, url: page.url(), phase: cap.phase, screenshot: await screenshot('click')};
