@@ -139,11 +139,17 @@ export async function analyze(runDir) {
     // Google consent mode with storage denied: a ping with no cookies, only a temporary ID.
     const gcs = ps.find(([k]) => k === 'gcs')?.[1];
     if (gcs && /^G10[01]$/.test(gcs) && /google|doubleclick/.test(hostOf(r.url))) return false;
-    return ps.some(([k, v]) => /^(cid|uid|fbp|fbc|_fbp|guid|tdid|mid|vid|uuid|ttp|anonymous_id|user_id|userId|client_id|gclid|sid)$|\.anonymous_id$|\.ttp$/i.test(k) && v && v.length >= 6 && !/^[0\-.:]+$/.test(v) && !/^(null|undefined|none|false|0)$/i.test(v));
+    // An ID parameter counts only when it follows you: the same value repeats, or it is stored in a cookie or storage.
+    return ps.some(([k, v]) => /^(cid|uid|fbp|fbc|_fbp|guid|tdid|mid|vid|uuid|ttp|anonymous_id|user_id|userId|client_id|gclid|sid)$|\.anonymous_id$|\.ttp$|afWebUserId$|customUserId$/i.test(k) && v && v.length >= 6 && !/^[0\-.:]+$/.test(v) && !/^(null|undefined|none|false|0)$/i.test(v) && persistent(v));
   };
+  let persistent = () => true;
 
   for (const v of visits) {
     const idn = ids[v.identity] || {};
+    const stored = [...v.cookies.map((c) => c.value), ...Object.values(v.storage || {}).flatMap((o) => [...Object.values(o.local || {}), ...Object.values(o.session || {})])].join('\n');
+    const seenCount = new Map();
+    for (const r of v.requests) for (const [, val] of params(r)) if (val && val.length >= 6) seenCount.set(val, (seenCount.get(val) || 0) + 1);
+    persistent = (val) => (seenCount.get(val) || 0) >= 2 || stored.includes(val);
     const consentClick = v.actions.find((a) => a.kind === 'click' && a.inBanner && /^after-(reject|accept)/.test(a.phase || ''));
     const tc = consentClick ? consentClick.t : null;
     const clicked = consentClick ? (consentClick.phase.startsWith('after-reject') ? 'reject' : 'accept') : 'nothing';
