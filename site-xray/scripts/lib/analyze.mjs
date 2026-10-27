@@ -10,6 +10,8 @@ const TRACKING = new Set(['advertising', 'analytics', 'session recording', 'soci
 const ADLIKE = new Set(['advertising', 'analytics', 'session recording', 'social']);
 // Most telling role wins when one company shows up under several.
 const RANK = ['unknown', 'other', 'cdn or hosting', 'payments', 'customer support', 'consent platform', 'tag manager', 'fingerprinting or bot protection', 'social', 'analytics', 'session recording', 'advertising'];
+// Cookies that keep a site working or record the consent choice, not an ID that follows you.
+const TECH_COOKIE = /^(datadome|__cf_bm|cf_clearance|_cfuvid|__cflb|AWSALB\w*|AWSELB\w*|ak_bmsc|bm_\w+|_abck|incap_ses\w*|visid_incap\w*|nlbi_\w*|euconsent(-v2)?|OptanonConsent|OptanonAlertBoxClosed|usprivacy|__gpp\w*|CookieConsent|didomi_token|uc_\w+|consentUUID|_sp_\w+|JSESSIONID|PHPSESSID|__Secure-\w*csrf\w*)$/i;
 const TITLE_PARAM = /^(dt|tl|title|page_title|pt|t)$|\.title$/i;
 const CONSENT_PARAM = /^(gdpr_consent|gdpr_pd|gpp|gpp_sid|addtl_consent|us_privacy|consent|tcf|euconsent|euconsent-v2|_body)$/i;
 const SESSION_REC = /(^|\.)(clarity\.ms|hotjar\.(com|io)|fullstory\.com|smartlook\.(com|cloud)|mouseflow\.com|logrocket\.(com|io)|lr-ingest\.io|contentsquare\.net|contentsquare\.com|quantummetric\.com|inspectlet\.com|luckyorange\.(com|net)|crazyegg\.com)$/;
@@ -132,12 +134,12 @@ export async function analyze(runDir) {
     return c.split(/;\s*/).map((x) => x.split('=')[0]).filter(Boolean);
   };
   const carriesId = (r) => {
-    if (cookieNames(r).length) return true;
+    if (cookieNames(r).some((c) => !TECH_COOKIE.test(c))) return true;
     const ps = params(r);
     // Google consent mode with storage denied: a ping with no cookies, only a temporary ID.
     const gcs = ps.find(([k]) => k === 'gcs')?.[1];
     if (gcs && /^G10[01]$/.test(gcs) && /google|doubleclick/.test(hostOf(r.url))) return false;
-    return ps.some(([k, v]) => /^(cid|uid|fbp|fbc|_fbp|guid|tdid|mid|vid|uuid|ttp|anonymous_id|user_id|userId|client_id|gclid|sid)$|\.anonymous_id$|\.ttp$/i.test(k) && v && v.length >= 6);
+    return ps.some(([k, v]) => /^(cid|uid|fbp|fbc|_fbp|guid|tdid|mid|vid|uuid|ttp|anonymous_id|user_id|userId|client_id|gclid|sid)$|\.anonymous_id$|\.ttp$/i.test(k) && v && v.length >= 6 && !/^[0\-.:]+$/.test(v) && !/^(null|undefined|none|false|0)$/i.test(v));
   };
 
   for (const v of visits) {
@@ -194,6 +196,7 @@ export async function analyze(runDir) {
       if (noId.length)
         checks.push({check: 'after-reject', identity: v.identity, kind: 'cookieless', companies: uniq(noId.map((r) => who(hostOf(r.url)).name)), count: noId.length, evidence: noId.slice(0, 60).map((r) => ev(v, r)), summary: `After "Reject", ${noId.length} ad or analytics requests went out without cookies or an ID.`});
       const left = v.cookies
+        .filter((c) => !TECH_COOKIE.test(c.name))
         .map((c) => {
           const dom = c.domain.replace(/^\./, '');
           const w = who(dom);
