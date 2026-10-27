@@ -183,7 +183,7 @@ export async function analyze(runDir) {
       if (withId.length)
         checks.push({check: 'before-consent', identity: v.identity, kind: 'with an ID', companies: uniq(withId.map((r) => who(hostOf(r.url)).name)), count: withId.length, evidence: withId.slice(0, 60).map((r) => ev(v, r)), summary: `Before any button was clicked, ${uniq(withId.map((r) => who(hostOf(r.url)).name)).length} ad or analytics companies got requests carrying an ID or cookies.`});
       if (noId.length)
-        checks.push({check: 'before-consent', identity: v.identity, kind: 'cookieless', companies: uniq(noId.map((r) => who(hostOf(r.url)).name)), count: noId.length, evidence: noId.slice(0, 60).map((r) => ev(v, r)), summary: `Before any button was clicked, ${noId.length} ad or analytics requests went out without cookies or an ID (page address and browser details only).`});
+        checks.push({check: 'before-consent', identity: v.identity, kind: 'cookieless', companies: uniq(noId.map((r) => who(hostOf(r.url)).name)), count: noId.length, evidence: noId.slice(0, 60).map((r) => ev(v, r)), summary: `Before any button was clicked, ${noId.length} ad or analytics requests went out without cookies or an ID.`});
     }
 
     // 2. after reject

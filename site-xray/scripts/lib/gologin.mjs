@@ -55,7 +55,7 @@ const saveLedger = (l) => writeJson(LEDGER, l);
 
 export async function traffic() {
   const {data} = await api('GET', '/users-proxies/geolocation/traffic');
-  const r = data?.residentialTrafficData || {};
+  const r = data?.residentTrafficData || data?.residentialTrafficData || {};
   return {usedBytes: r.trafficUsedBytes ?? null, limitBytes: r.trafficLimitBytes ?? null};
 }
 
@@ -83,15 +83,23 @@ export async function createProfile({name, os, country}) {
 
 export const connectUrl = (id) => `wss://cloudbrowser.gologin.com/connect?token=${encodeURIComponent(need())}&profile=${id}`;
 
-// 403 = token or plan, 503 = capacity or the parallel-session limit.
+// The connect endpoint starts the cloud browser; answer 200 {"status":"ok"} once it is ready.
+// 403 = token or plan, 503 = capacity or the parallel-session limit. Waits up to 2 minutes.
 export async function preflight(id) {
-  try {
-    const res = await fetch(`${CLOUD}/connect?token=${encodeURIComponent(need())}&profile=${id}`, {signal: AbortSignal.timeout(5000)});
-    return {status: res.status, reason: res.headers.get('x-error-reason') || null};
-  } catch (e) {
-    // A timeout here usually means the endpoint is waiting for a WebSocket upgrade: fine.
-    return {status: 0, reason: e.name === 'TimeoutError' ? 'timeout (normal for a websocket endpoint)' : redact(e.message)};
+  const end = Date.now() + 120000;
+  let last = {status: 0, reason: 'no answer'};
+  while (Date.now() < end) {
+    try {
+      const res = await fetch(`${CLOUD}/connect?token=${encodeURIComponent(need())}&profile=${id}`, {signal: AbortSignal.timeout(30000)});
+      last = {status: res.status, reason: res.headers.get('x-error-reason') || null};
+      if (res.status === 200 || res.status === 403) return last;
+      if (res.status === 503 && /limit|parallel|concurren/i.test(last.reason || '')) return last;
+    } catch (e) {
+      last = {status: 0, reason: e.name === 'TimeoutError' ? 'still starting' : redact(e.message)};
+    }
+    await new Promise((r) => setTimeout(r, 3000));
   }
+  return last;
 }
 
 export async function liveView(id) {
