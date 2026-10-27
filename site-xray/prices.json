@@ -1,0 +1,18 @@
+{
+  "checked": "2026-10-27",
+  "anthropic_source": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "note": "USD per million tokens, API list prices. Cache writes: 5 min 1.25x input, 1 h 2x input.",
+  "models": {
+    "claude-fable-5-1":  {"name": "Fable 5.1",  "input": 10,  "write_5m": 12.5,  "write_1h": 20,  "cache_read": 0.25, "output": 50},
+    "claude-opus-5-5":   {"name": "Opus 5.5",   "input": 4,   "write_5m": 5,     "write_1h": 8,   "cache_read": 0.20, "output": 20, "fast": {"input": 8, "output": 40}},
+    "claude-sonnet-5-5": {"name": "Sonnet 5.5", "input": 2,   "write_5m": 2.5,   "write_1h": 4,   "cache_read": 0.10, "output": 10},
+    "claude-haiku-5-5":  {"name": "Haiku 5.5",  "input": 0.10, "write_5m": 0.125, "write_1h": 0.20, "cache_read": 0.01, "output": 0.50,
+                          "over_100k": {"input": 0.50, "write_5m": 0.625, "write_1h": 1, "cache_read": 0.05, "output": 2.50}}
+  },
+  "gologin": {
+    "source": "https://gologin.com/cloud-browser/",
+    "note": "Fill in your own plan's rates. Leave null to show minutes and MB without a price.",
+    "per_browser_hour": null,
+    "per_gb_residential": null
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "eu-reject":   {"mode": "gologin", "os": "win",     "device": "Windows laptop", "country": "de", "language": "de-DE", "consent": "reject", "label": "German laptop, clicked Reject"},
+  "eu-reject-2": {"mode": "gologin", "os": "win",     "device": "Windows laptop", "country": "de", "language": "de-DE", "consent": "reject", "label": "German laptop, repeat run", "repeat_of": "eu-reject"},
+  "eu-accept":   {"mode": "gologin", "os": "win",     "device": "Windows laptop", "country": "de", "language": "de-DE", "consent": "accept", "label": "German laptop, clicked Accept"},
+  "us":          {"mode": "gologin", "os": "win",     "device": "Windows laptop", "country": "us", "language": "en-US", "consent": "default", "label": "American laptop, clicked nothing"},
+  "uk-phone":    {"mode": "gologin", "os": "android", "device": "Android phone",  "country": "gb", "language": "en-GB", "consent": "reject", "label": "British phone, clicked Reject"},
+  "local":       {"mode": "local",   "os": null,      "device": "your Chrome",    "country": null, "language": null,    "consent": "reject", "label": "You, your own Chrome, clicked Reject"}
+}

@@ -1,0 +1,141 @@
+// Gologin Cloud Browser over plain fetch (no Gologin SDK, so the repo stays MIT).
+// Each visit gets its own temporary profile: its own device fingerprint and a residential IP in one country.
+import {execFileSync} from 'node:child_process';
+import path from 'node:path';
+import {CACHE, readJson, writeJson, redact} from './util.mjs';
+
+const API = 'https://api.gologin.com';
+const CLOUD = 'https://cloudbrowser.gologin.com';
+const LEDGER = path.join(CACHE, 'profiles.json');
+
+export function token() {
+  if (process.env.GOLOGIN_TOKEN) return process.env.GOLOGIN_TOKEN.trim();
+  try {
+    return execFileSync('security', ['find-generic-password', '-s', 'GOLOGIN_TOKEN', '-w'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+const need = () => {
+  const t = token();
+  if (!t) throw new Error('No Gologin token. Save it with: security add-generic-password -a "$USER" -s GOLOGIN_TOKEN -w');
+  return t;
+};
+
+async function api(method, route, body, {ok404 = false} = {}) {
+  const res = await fetch(API + route, {
+    method,
+    headers: {Authorization: `Bearer ${need()}`, 'Content-Type': 'application/json'},
+    body: body === undefined ? undefined : JSON.stringify(body),
+    signal: AbortSignal.timeout(30000),
+  });
+  const text = await res.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+  if (!res.ok && !(ok404 && res.status === 404)) {
+    const msg = typeof data === 'object' && data ? data.message || data.error || JSON.stringify(data).slice(0, 200) : String(data).slice(0, 200);
+    throw new Error(`Gologin ${method} ${redact(route)} -> ${res.status}: ${redact(msg)}`);
+  }
+  return {status: res.status, data};
+}
+
+const ledger = () => readJson(LEDGER, []);
+const saveLedger = (l) => writeJson(LEDGER, l);
+
+export async function traffic() {
+  const {data} = await api('GET', '/users-proxies/geolocation/traffic');
+  const r = data?.residentialTrafficData || {};
+  return {usedBytes: r.trafficUsedBytes ?? null, limitBytes: r.trafficLimitBytes ?? null};
+}
+
+export async function createProfile({name, os, country}) {
+  const {data} = await api('POST', '/browser/custom', {name, notes: '', os});
+  const id = data?.id;
+  if (!id) throw new Error('Gologin did not return a profile id');
+  saveLedger([...ledger(), {id, name, created: new Date().toISOString()}]);
+  // Current browser version for the fingerprint; not fatal if the plan doesn't allow it.
+  await api('PATCH', '/browser/update_ua_to_new_browser_v', {
+    browserIds: [id],
+    updateUaToNewBrowserV: true,
+    updateAllProfiles: false,
+    testOrbita: false,
+  }).catch(() => {});
+  if (country) {
+    try {
+      await api('POST', '/users-proxies/mobile-proxy', {countryCode: country, isDc: false, isMobile: false, profileIdToLink: id});
+    } catch {
+      await api('PATCH', `/browser/${id}/proxy`, {mode: 'gologin', autoProxyRegion: country});
+    }
+  }
+  return id;
+}
+
+export const connectUrl = (id) => `wss://cloudbrowser.gologin.com/connect?token=${encodeURIComponent(need())}&profile=${id}`;
+
+// 403 = token or plan, 503 = capacity or the parallel-session limit.
+export async function preflight(id) {
+  try {
+    const res = await fetch(`${CLOUD}/connect?token=${encodeURIComponent(need())}&profile=${id}`, {signal: AbortSignal.timeout(5000)});
+    return {status: res.status, reason: res.headers.get('x-error-reason') || null};
+  } catch (e) {
+    // A timeout here usually means the endpoint is waiting for a WebSocket upgrade: fine.
+    return {status: 0, reason: e.name === 'TimeoutError' ? 'timeout (normal for a websocket endpoint)' : redact(e.message)};
+  }
+}
+
+export async function liveView(id) {
+  const {data} = await api('POST', `/browser/${id}/web`, {});
+  return data?.remoteOrbitaUrl || null;
+}
+
+export async function usage(id) {
+  try {
+    const {data} = await api('GET', `/cloud-usage/profile/${id}/stats`);
+    return data;
+  } catch (e) {
+    return {error: redact(e.message)};
+  }
+}
+
+export async function endSession(id) {
+  await api('DELETE', `/browser/${id}/web`, undefined, {ok404: true}).catch(() => {});
+}
+
+export async function deleteProfile(id) {
+  await api('DELETE', `/browser/${id}`, undefined, {ok404: true});
+  saveLedger(ledger().filter((p) => p.id !== id));
+}
+
+// Deletes every temporary profile this tool created, also after a crash.
+export async function cleanup() {
+  const done = [];
+  for (const p of ledger()) {
+    await endSession(p.id);
+    try {
+      await deleteProfile(p.id);
+      done.push(p.name);
+    } catch (e) {
+      done.push(`${p.name} (failed: ${redact(e.message)})`);
+    }
+  }
+  // Leftovers that never made it into the ledger.
+  try {
+    const {data} = await api('GET', '/browser/v2?search=site-xray-');
+    for (const p of data?.profiles || []) {
+      if (String(p.name || '').startsWith('site-xray-')) {
+        await endSession(p.id);
+        await deleteProfile(p.id).catch(() => {});
+        done.push(p.name);
+      }
+    }
+  } catch {}
+  return done;
+}

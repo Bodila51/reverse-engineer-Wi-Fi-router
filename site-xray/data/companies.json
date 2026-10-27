@@ -1,0 +1,1230 @@
+{
+ "version": "2026-10-27",
+ "note": "Domain patterns -> company. hq_country only where verified on the company's own page (source URL given); otherwise null.",
+ "companies": [
+  {
+   "name": "Google",
+   "category": "advertising",
+   "domains": [
+    "google-analytics.com",
+    "googletagmanager.com",
+    "googletagservices.com",
+    "doubleclick.net",
+    "googlesyndication.com",
+    "googleadservices.com",
+    "google.com",
+    "gstatic.com",
+    "googleapis.com",
+    "googleusercontent.com",
+    "ggpht.com",
+    "recaptcha.net",
+    "2mdn.net",
+    "admob.com",
+    "app-measurement.com",
+    "googleoptimize.com",
+    "youtube.com",
+    "youtube-nocookie.com",
+    "ytimg.com",
+    "googlevideo.com"
+   ],
+   "category_by_domain": {
+    "google-analytics.com": "analytics",
+    "app-measurement.com": "analytics",
+    "googleoptimize.com": "analytics",
+    "googletagmanager.com": "tag manager",
+    "gstatic.com": "cdn or hosting",
+    "googleapis.com": "cdn or hosting",
+    "googleusercontent.com": "cdn or hosting",
+    "ggpht.com": "cdn or hosting",
+    "ytimg.com": "cdn or hosting",
+    "googlevideo.com": "cdn or hosting",
+    "recaptcha.net": "fingerprinting or bot protection",
+    "youtube.com": "other",
+    "youtube-nocookie.com": "other"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Meta",
+   "category": "advertising",
+   "domains": [
+    "facebook.com",
+    "facebook.net",
+    "fbcdn.net",
+    "instagram.com",
+    "cdninstagram.com",
+    "fb.com",
+    "whatsapp.com",
+    "messenger.com"
+   ],
+   "category_by_domain": {
+    "fbcdn.net": "cdn or hosting",
+    "cdninstagram.com": "cdn or hosting",
+    "instagram.com": "social",
+    "whatsapp.com": "social",
+    "messenger.com": "social"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Microsoft",
+   "category": "advertising",
+   "domains": [
+    "bing.com",
+    "clarity.ms",
+    "msn.com",
+    "microsoft.com",
+    "live.com",
+    "msecnd.net",
+    "azureedge.net",
+    "applicationinsights.azure.com"
+   ],
+   "category_by_domain": {
+    "clarity.ms": "session recording",
+    "msn.com": "other",
+    "microsoft.com": "other",
+    "live.com": "other",
+    "msecnd.net": "cdn or hosting",
+    "azureedge.net": "cdn or hosting",
+    "applicationinsights.azure.com": "analytics"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Amazon Advertising",
+   "category": "advertising",
+   "domains": [
+    "amazon-adsystem.com",
+    "assoc-amazon.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Amazon Web Services",
+   "category": "cdn or hosting",
+   "domains": [
+    "cloudfront.net",
+    "amazonaws.com",
+    "media-amazon.com",
+    "ssl-images-amazon.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "TikTok",
+   "category": "advertising",
+   "domains": [
+    "tiktok.com",
+    "tiktokw.us",
+    "tiktokv.com",
+    "tiktokcdn.com",
+    "tiktokcdn-us.com",
+    "byteoversea.com",
+    "ttwstatic.com",
+    "ibytedtos.com",
+    "ibyteimg.com",
+    "bytedance.com",
+    "musical.ly"
+   ],
+   "category_by_domain": {
+    "tiktokcdn.com": "cdn or hosting",
+    "tiktokcdn-us.com": "cdn or hosting",
+    "ttwstatic.com": "cdn or hosting",
+    "ibytedtos.com": "cdn or hosting",
+    "ibyteimg.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "LinkedIn",
+   "category": "advertising",
+   "domains": [
+    "linkedin.com",
+    "licdn.com"
+   ],
+   "category_by_domain": {
+    "licdn.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "X (Twitter)",
+   "category": "advertising",
+   "domains": [
+    "twitter.com",
+    "t.co",
+    "ads-twitter.com",
+    "x.com",
+    "twimg.com",
+    "twttr.com"
+   ],
+   "category_by_domain": {
+    "twimg.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Pinterest",
+   "category": "advertising",
+   "domains": [
+    "pinterest.com",
+    "pinimg.com"
+   ],
+   "category_by_domain": {
+    "pinimg.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Snap",
+   "category": "advertising",
+   "domains": [
+    "snapchat.com",
+    "snap.com",
+    "sc-static.net"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Reddit",
+   "category": "advertising",
+   "domains": [
+    "reddit.com",
+    "redditmedia.com",
+    "redditstatic.com",
+    "redd.it"
+   ],
+   "category_by_domain": {
+    "redditstatic.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Criteo",
+   "category": "advertising",
+   "domains": [
+    "criteo.com",
+    "criteo.net"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Taboola",
+   "category": "advertising",
+   "domains": [
+    "taboola.com",
+    "taboolasyndication.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Outbrain",
+   "category": "advertising",
+   "domains": [
+    "outbrain.com",
+    "outbrainimg.com",
+    "zemanta.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "The Trade Desk",
+   "category": "advertising",
+   "domains": [
+    "adsrvr.org",
+    "thetradedesk.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Yandex",
+   "category": "advertising",
+   "domains": [
+    "yandex.ru",
+    "yandex.com",
+    "yandex.net",
+    "ya.ru",
+    "yastatic.net",
+    "mc.yandex.ru",
+    "mc.yandex.com",
+    "yandexadexchange.net"
+   ],
+   "category_by_domain": {
+    "mc.yandex.ru": "analytics",
+    "mc.yandex.com": "analytics",
+    "yastatic.net": "cdn or hosting",
+    "yandex.net": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Hotjar",
+   "category": "session recording",
+   "domains": [
+    "hotjar.com",
+    "hotjar.io"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Contentsquare",
+   "category": "session recording",
+   "domains": [
+    "contentsquare.com",
+    "contentsquare.net"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "FullStory",
+   "category": "session recording",
+   "domains": [
+    "fullstory.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Smartlook",
+   "category": "session recording",
+   "domains": [
+    "smartlook.com",
+    "smartlook.cloud"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Mouseflow",
+   "category": "session recording",
+   "domains": [
+    "mouseflow.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "LogRocket",
+   "category": "session recording",
+   "domains": [
+    "logrocket.com",
+    "logrocket.io",
+    "lr-ingest.io"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Quantum Metric",
+   "category": "session recording",
+   "domains": [
+    "quantummetric.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Adobe",
+   "category": "analytics",
+   "domains": [
+    "omtrdc.net",
+    "demdex.net",
+    "everesttech.net",
+    "adobedtm.com",
+    "2o7.net",
+    "omniture.com",
+    "adobedc.net",
+    "adobe.com",
+    "adobe.io",
+    "typekit.net"
+   ],
+   "category_by_domain": {
+    "adobedtm.com": "tag manager",
+    "demdex.net": "advertising",
+    "everesttech.net": "advertising",
+    "typekit.net": "cdn or hosting",
+    "adobe.com": "other",
+    "adobe.io": "other"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Oracle",
+   "category": "advertising",
+   "domains": [
+    "bluekai.com",
+    "bkrtx.com",
+    "addthis.com",
+    "addthisedge.com",
+    "moatads.com",
+    "eloqua.com",
+    "en25.com",
+    "oracle.com"
+   ],
+   "category_by_domain": {
+    "addthis.com": "social",
+    "addthisedge.com": "social",
+    "moatads.com": "analytics",
+    "eloqua.com": "other",
+    "en25.com": "other",
+    "oracle.com": "other"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Salesforce",
+   "category": "other",
+   "domains": [
+    "krxd.net",
+    "exacttarget.com",
+    "evergage.com",
+    "salesforce.com",
+    "force.com",
+    "pardot.com",
+    "igodigital.com"
+   ],
+   "category_by_domain": {
+    "krxd.net": "advertising",
+    "evergage.com": "analytics"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "HubSpot",
+   "category": "analytics",
+   "domains": [
+    "hubspot.com",
+    "hs-scripts.com",
+    "hs-analytics.net",
+    "hsforms.net",
+    "hsforms.com",
+    "hscollectedforms.net",
+    "hs-banner.com",
+    "hsadspixel.net",
+    "hubapi.com",
+    "hs-sites.com"
+   ],
+   "category_by_domain": {
+    "hs-banner.com": "consent platform",
+    "hsforms.net": "other",
+    "hsforms.com": "other"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Segment (Twilio)",
+   "category": "analytics",
+   "domains": [
+    "segment.com",
+    "segment.io"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Amplitude",
+   "category": "analytics",
+   "domains": [
+    "amplitude.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Mixpanel",
+   "category": "analytics",
+   "domains": [
+    "mixpanel.com",
+    "mxpnl.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Heap",
+   "category": "analytics",
+   "domains": [
+    "heap.io",
+    "heapanalytics.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "PostHog",
+   "category": "analytics",
+   "domains": [
+    "posthog.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Matomo Cloud",
+   "category": "analytics",
+   "domains": [
+    "matomo.cloud",
+    "innocraft.cloud"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Plausible",
+   "category": "analytics",
+   "domains": [
+    "plausible.io"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Cloudflare",
+   "category": "cdn or hosting",
+   "domains": [
+    "cloudflare.com",
+    "cloudflare.net",
+    "cloudflareinsights.com",
+    "cdnjs.cloudflare.com",
+    "challenges.cloudflare.com",
+    "cloudflarestream.com",
+    "workers.dev",
+    "pages.dev"
+   ],
+   "category_by_domain": {
+    "cloudflareinsights.com": "analytics",
+    "challenges.cloudflare.com": "fingerprinting or bot protection"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Akamai",
+   "category": "cdn or hosting",
+   "domains": [
+    "akamai.com",
+    "akamai.net",
+    "akamaihd.net",
+    "akamaized.net",
+    "akamaiedge.net",
+    "akamaitechnologies.com",
+    "edgekey.net",
+    "edgesuite.net",
+    "go-mpulse.net",
+    "akstat.io"
+   ],
+   "category_by_domain": {
+    "go-mpulse.net": "analytics",
+    "akstat.io": "analytics"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Fastly",
+   "category": "cdn or hosting",
+   "domains": [
+    "fastly.net",
+    "fastly.com",
+    "fastlylb.net",
+    "fastly-insights.com"
+   ],
+   "category_by_domain": {
+    "fastly-insights.com": "analytics"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "jsDelivr",
+   "category": "cdn or hosting",
+   "domains": [
+    "jsdelivr.net"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "unpkg",
+   "category": "cdn or hosting",
+   "domains": [
+    "unpkg.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "OneTrust",
+   "category": "consent platform",
+   "domains": [
+    "cookielaw.org",
+    "onetrust.com",
+    "onetrust.io",
+    "cookiepro.com"
+   ],
+   "hq_country": "US",
+   "hq_source": "https://www.onetrust.com/contact/"
+  },
+  {
+   "name": "Usercentrics (Cookiebot)",
+   "category": "consent platform",
+   "domains": [
+    "cookiebot.com",
+    "usercentrics.eu",
+    "usercentrics.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Didomi",
+   "category": "consent platform",
+   "domains": [
+    "didomi.io"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Quantcast",
+   "category": "advertising",
+   "domains": [
+    "quantserve.com",
+    "quantcount.com",
+    "quantcast.com",
+    "cmp.quantcast.com",
+    "quantcast.mgr.consensu.org"
+   ],
+   "category_by_domain": {
+    "cmp.quantcast.com": "consent platform",
+    "quantcast.mgr.consensu.org": "consent platform"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Sourcepoint",
+   "category": "consent platform",
+   "domains": [
+    "sourcepoint.com",
+    "sp-prod.net",
+    "privacy-mgmt.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "TrustArc",
+   "category": "consent platform",
+   "domains": [
+    "trustarc.com",
+    "truste.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Complianz",
+   "category": "consent platform",
+   "domains": [
+    "complianz.io"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Iubenda",
+   "category": "consent platform",
+   "domains": [
+    "iubenda.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Osano",
+   "category": "consent platform",
+   "domains": [
+    "osano.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Ketch",
+   "category": "consent platform",
+   "domains": [
+    "ketch.com",
+    "ketchcdn.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Index Exchange",
+   "category": "advertising",
+   "domains": [
+    "casalemedia.com",
+    "indexww.com",
+    "indexexchange.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "PubMatic",
+   "category": "advertising",
+   "domains": [
+    "pubmatic.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Magnite (Rubicon)",
+   "category": "advertising",
+   "domains": [
+    "rubiconproject.com",
+    "magnite.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "OpenX",
+   "category": "advertising",
+   "domains": [
+    "openx.net",
+    "openx.com",
+    "servedbyopenx.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Xandr (AppNexus)",
+   "category": "advertising",
+   "domains": [
+    "adnxs.com",
+    "adnxs-simple.com",
+    "xandr.com",
+    "appnexus.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Sovrn",
+   "category": "advertising",
+   "domains": [
+    "lijit.com",
+    "sovrn.com",
+    "viglink.com",
+    "redirectingat.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Media.net",
+   "category": "advertising",
+   "domains": [
+    "media.net"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "ID5",
+   "category": "advertising",
+   "domains": [
+    "id5-sync.com",
+    "id5.io"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "LiveRamp",
+   "category": "advertising",
+   "domains": [
+    "rlcdn.com",
+    "pippio.com",
+    "liveramp.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Lotame",
+   "category": "advertising",
+   "domains": [
+    "crwdcntrl.net",
+    "lotame.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Tapad",
+   "category": "advertising",
+   "domains": [
+    "tapad.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Neustar",
+   "category": "advertising",
+   "domains": [
+    "agkn.com",
+    "neustar.biz"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Nielsen",
+   "category": "analytics",
+   "domains": [
+    "imrworldwide.com",
+    "nielsen.com",
+    "exelator.com"
+   ],
+   "category_by_domain": {
+    "exelator.com": "advertising"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "comScore",
+   "category": "analytics",
+   "domains": [
+    "scorecardresearch.com",
+    "comscore.com",
+    "voicefive.com",
+    "zqtk.net"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Chartbeat",
+   "category": "analytics",
+   "domains": [
+    "chartbeat.com",
+    "chartbeat.net"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Parse.ly",
+   "category": "analytics",
+   "domains": [
+    "parsely.com",
+    "parse.ly"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Optimizely",
+   "category": "analytics",
+   "domains": [
+    "optimizely.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "VWO (Wingify)",
+   "category": "analytics",
+   "domains": [
+    "visualwebsiteoptimizer.com",
+    "vwo.com",
+    "wingify.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "AB Tasty",
+   "category": "analytics",
+   "domains": [
+    "abtasty.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Dynamic Yield",
+   "category": "analytics",
+   "domains": [
+    "dynamicyield.com",
+    "dyntrk.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Kameleoon",
+   "category": "analytics",
+   "domains": [
+    "kameleoon.com",
+    "kameleoon.eu"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Bazaarvoice",
+   "category": "other",
+   "domains": [
+    "bazaarvoice.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Trustpilot",
+   "category": "other",
+   "domains": [
+    "trustpilot.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Yotpo",
+   "category": "other",
+   "domains": [
+    "yotpo.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Klaviyo",
+   "category": "other",
+   "domains": [
+    "klaviyo.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Braze",
+   "category": "other",
+   "domains": [
+    "braze.com",
+    "appboy.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "OneSignal",
+   "category": "other",
+   "domains": [
+    "onesignal.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Intercom",
+   "category": "customer support",
+   "domains": [
+    "intercom.io",
+    "intercom.com",
+    "intercomcdn.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Zendesk",
+   "category": "customer support",
+   "domains": [
+    "zendesk.com",
+    "zdassets.com",
+    "zopim.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Drift",
+   "category": "customer support",
+   "domains": [
+    "drift.com",
+    "driftt.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Stripe",
+   "category": "payments",
+   "domains": [
+    "stripe.com",
+    "stripe.network"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "PayPal",
+   "category": "payments",
+   "domains": [
+    "paypal.com",
+    "paypalobjects.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Shopify",
+   "category": "other",
+   "domains": [
+    "shopify.com",
+    "shopifycdn.com",
+    "shopifysvc.com",
+    "myshopify.com",
+    "shop.app"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "New Relic",
+   "category": "analytics",
+   "domains": [
+    "newrelic.com",
+    "nr-data.net"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Datadog",
+   "category": "analytics",
+   "domains": [
+    "datadoghq.com",
+    "datadoghq.eu",
+    "datadoghq-browser-agent.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Sentry",
+   "category": "analytics",
+   "domains": [
+    "sentry.io",
+    "sentry-cdn.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "DataDome",
+   "category": "fingerprinting or bot protection",
+   "domains": [
+    "datadome.co"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "HUMAN (PerimeterX)",
+   "category": "fingerprinting or bot protection",
+   "domains": [
+    "perimeterx.net",
+    "px-cdn.net",
+    "px-cloud.net",
+    "px-client.net",
+    "pxchk.net",
+    "humansecurity.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "hCaptcha",
+   "category": "fingerprinting or bot protection",
+   "domains": [
+    "hcaptcha.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Teads",
+   "category": "advertising",
+   "domains": [
+    "teads.tv",
+    "teads.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Seedtag",
+   "category": "advertising",
+   "domains": [
+    "seedtag.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Smart AdServer (Equativ)",
+   "category": "advertising",
+   "domains": [
+    "smartadserver.com",
+    "sascdn.com",
+    "equativ.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Adform",
+   "category": "advertising",
+   "domains": [
+    "adform.net",
+    "adformdsp.net",
+    "adform.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Sizmek",
+   "category": "advertising",
+   "domains": [
+    "sizmek.com",
+    "serving-sys.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Yahoo (Verizon Media)",
+   "category": "advertising",
+   "domains": [
+    "yahoo.com",
+    "advertising.com",
+    "yimg.com",
+    "yahooapis.com",
+    "oath.com",
+    "aol.com",
+    "adtechus.com"
+   ],
+   "category_by_domain": {
+    "yimg.com": "cdn or hosting",
+    "yahooapis.com": "cdn or hosting",
+    "yahoo.com": "other"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Branch",
+   "category": "analytics",
+   "domains": [
+    "branch.io",
+    "app.link",
+    "bnc.lt"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "AppsFlyer",
+   "category": "analytics",
+   "domains": [
+    "appsflyer.com",
+    "appsflyersdk.com",
+    "onelink.me"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Adjust",
+   "category": "analytics",
+   "domains": [
+    "adjust.com",
+    "adjust.io",
+    "adj.st"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Impact",
+   "category": "advertising",
+   "domains": [
+    "impact.com",
+    "impactradius.com",
+    "impactradius-go.com",
+    "impactradius-event.com",
+    "sjv.io"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Awin",
+   "category": "advertising",
+   "domains": [
+    "awin1.com",
+    "awin.com",
+    "dwin1.com",
+    "zenaps.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Rakuten Advertising",
+   "category": "advertising",
+   "domains": [
+    "linksynergy.com",
+    "rakutenadvertising.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "CJ Affiliate",
+   "category": "advertising",
+   "domains": [
+    "cj.com",
+    "emjcd.com",
+    "dpbolvw.net",
+    "jdoqocy.com",
+    "tkqlhce.com",
+    "anrdoezrs.net",
+    "kqzyfj.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Skimlinks",
+   "category": "advertising",
+   "domains": [
+    "skimlinks.com",
+    "skimresources.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "Vimeo",
+   "category": "other",
+   "domains": [
+    "vimeo.com",
+    "vimeocdn.com"
+   ],
+   "category_by_domain": {
+    "vimeocdn.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Wistia",
+   "category": "other",
+   "domains": [
+    "wistia.com",
+    "wistia.net"
+   ],
+   "category_by_domain": {
+    "wistia.net": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "JW Player",
+   "category": "other",
+   "domains": [
+    "jwplayer.com",
+    "jwpcdn.com",
+    "jwpsrv.com"
+   ],
+   "category_by_domain": {
+    "jwpcdn.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Brightcove",
+   "category": "other",
+   "domains": [
+    "brightcove.com",
+    "brightcove.net",
+    "brightcovecdn.com"
+   ],
+   "category_by_domain": {
+    "brightcove.net": "cdn or hosting",
+    "brightcovecdn.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "Disqus",
+   "category": "social",
+   "domains": [
+    "disqus.com",
+    "disquscdn.com"
+   ],
+   "category_by_domain": {
+    "disquscdn.com": "cdn or hosting"
+   },
+   "hq_country": null
+  },
+  {
+   "name": "AddToAny",
+   "category": "social",
+   "domains": [
+    "addtoany.com"
+   ],
+   "hq_country": null
+  },
+  {
+   "name": "ShareThis",
+   "category": "social",
+   "domains": [
+    "sharethis.com"
+   ],
+   "hq_country": null
+  }
+ ]
+}
