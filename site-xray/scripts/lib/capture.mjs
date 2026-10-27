@@ -405,6 +405,7 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
       }
       const u = new URL(dest, page.url());
       if (u.hostname.replace(/^www\./, '').split('.').slice(-2).join('.') !== site.hostname.replace(/^www\./, '').split('.').slice(-2).join('.')) throw new Error('stay on the same site');
+      if (/sign-?in|sign-?up|log-?in|register|account|auth|checkout|cart|basket|subscribe/i.test(u.hostname.split('.')[0] + u.pathname)) throw new Error('public pages only: pick an article, product or category, not a sign-in, account, cart or subscribe page');
       setPhase(phase);
       cap.actions.push({t: t(), kind: 'goto', url: u.href, phase: cap.phase});
       await page.goto(u.href, {waitUntil: 'domcontentloaded', timeout: 45000}).catch((e) => cap.problems.push(`goto: ${e.message.split('\n')[0]}`));
