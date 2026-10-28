@@ -2,7 +2,7 @@
 // site-xray: open a website as different visitors and see what it collects about each of them.
 //
 //   xray doctor
-//   xray start <url> --as <identity> --run <dir> [--watch] [--headless]
+//   xray start <url> --as <identity> --run <dir> [--watch] [--headless] [--record]
 //   xray look      --as <identity> --run <dir> [--find <text>]
 //   xray click <i> --as <identity> --run <dir> [--phase <name>]
 //   xray type <i> <text> --as <identity> --run <dir> [--phase <name>]
@@ -99,7 +99,7 @@ switch (cmd) {
     const run = readJson(meta, {runId: runId(), site: url, created: new Date().toISOString()});
     fs.writeFileSync(meta, JSON.stringify(run, null, 2));
     const log = fs.openSync(path.join(idDir, 'visit.log'), 'a');
-    const child = spawn(process.execPath, [fileURLToPath(import.meta.url), '_serve', url, '--as', String(flags.as), '--run', dir, '--runid', run.runId, ...(flags.watch ? ['--watch'] : []), ...(flags.headless ? ['--headless'] : [])], {detached: true, stdio: ['ignore', log, log]});
+    const child = spawn(process.execPath, [fileURLToPath(import.meta.url), '_serve', url, '--as', String(flags.as), '--run', dir, '--runid', run.runId, ...(flags.watch ? ['--watch'] : []), ...(flags.headless ? ['--headless'] : []), ...(flags.record ? ['--record'] : [])], {detached: true, stdio: ['ignore', log, log]});
     child.unref();
     const end = Date.now() + 180000;
     while (Date.now() < end) {
@@ -130,7 +130,7 @@ switch (cmd) {
   }
   case '_serve': {
     const {serve} = await import('./lib/capture.mjs');
-    await serve({url: pos[0], identity: String(flags.as), runDir: String(flags.run), runId: String(flags.runid), watch: !!flags.watch, headless: !!flags.headless}).catch((e) => {
+    await serve({url: pos[0], identity: String(flags.as), runDir: String(flags.run), runId: String(flags.runid), watch: !!flags.watch, headless: !!flags.headless, record: !!flags.record}).catch((e) => {
       console.error(redact(e.stack || e.message));
       process.exit(1);
     });

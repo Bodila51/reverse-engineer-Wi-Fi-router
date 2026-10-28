@@ -102,7 +102,7 @@ const COLLECT = ([cmpSel, looseSel, find]) => {
   return out.slice(0, 60);
 };
 
-export async function serve({url, identity, runDir, runId, watch, headless}) {
+export async function serve({url, identity, runDir, runId, watch, headless, record}) {
   const idn = identities()[identity];
   if (!idn) throw new Error(`unknown identity ${identity}`);
   const dir = path.join(runDir, identity);
@@ -272,6 +272,28 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
   ctx.pages().forEach(attachPage);
   ctx.on('page', attachPage);
   const page = ctx.pages()[0] ?? (await ctx.newPage());
+
+  // --record: the browser's own screen as JPEG frames (from the cloud browser, not this computer), kept across navigations.
+  let cdp = null;
+  if (record) {
+    fs.mkdirSync(path.join(dir, 'frames'), {recursive: true});
+    cap.frames = [];
+    try {
+      cdp = await ctx.newCDPSession(page);
+      cdp.on('Page.screencastFrame', async ({data, sessionId}) => {
+        const ms = t();
+        const name = `${String(ms).padStart(7, '0')}.jpg`;
+        try {
+          fs.writeFileSync(path.join(dir, 'frames', name), Buffer.from(data, 'base64'));
+          cap.frames.push({t: ms, file: `frames/${name}`, phase: cap.phase});
+        } catch {}
+        cdp.send('Page.screencastFrameAck', {sessionId}).catch(() => {});
+      });
+      await cdp.send('Page.startScreencast', {format: 'jpeg', quality: 80, maxWidth: 1280, maxHeight: 800, everyNthFrame: 2});
+    } catch (e) {
+      cap.problems.push(`record: ${redact(e.message.split('\n')[0])}`);
+    }
+  }
 
   const settle = async (quietMs = 3000, maxMs = 25000) => {
     const end = Date.now() + maxMs;
@@ -468,6 +490,7 @@ export async function serve({url, identity, runDir, runId, watch, headless}) {
     },
     async stop() {
       setPhase('end');
+      if (cdp) await cdp.send('Page.stopScreencast').catch(() => {});
       try {
         cap.cookies = await ctx.cookies();
       } catch (e) {

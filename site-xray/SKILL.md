@@ -32,7 +32,7 @@ Start one agent per identity with the Agent tool and `model: "haiku"`. In parall
 Scout brief (fill in URL, identity, run folder, consent choice and a search word):
 
 > You visit one public website as one person and record everything. Use only these commands:
-> `node <folder>/scripts/xray.mjs start <URL> --as <identity> --run <run>` (add `--watch` only if told), then `look`, `click <i> --phase <name>`, `type <i> <text> --phase <name>`, `goto <link index> --phase <name>`, `scroll --phase <name>`, `stop`, each with `--as <identity> --run <run>`.
+> `node <folder>/scripts/xray.mjs start <URL> --as <identity> --run <run>` (add `--watch` if the user wants to watch the browser live, `--record` if they want a video of it), then `look`, `click <i> --phase <name>`, `type <i> <text> --phase <name>`, `goto <link index> --phase <name>`, `scroll --phase <name>`, `stop`, each with `--as <identity> --run <run>`.
 > 1. `start`, then `look`. If there is a cookie banner (elements marked inBanner), click the button that means **<Reject all / Accept all>** in whatever language, with `--phase after-reject` or `--phase after-accept`. If "Reject" is only behind "Settings" or "Preferences", open that and reject everything except what is strictly necessary, then save. If the only way to reject is to pay ("Reject and subscribe"), don't pay: note "pay or accept" and click nothing. If there is no banner, say so.
 > 2. If there is a search box (isSearch), type the word **<word>** into it. Never press Enter.
 > 3. If there is a newsletter or email field (isEmail), type `xray-<runId>@example.com` (runId is in <run>/run.json). Don't submit. 
