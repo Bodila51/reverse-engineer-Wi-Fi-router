@@ -85,6 +85,7 @@ export async function cost(runDir) {
   const from = Date.parse(run.created || visits[0]?.startedAt || 0);
   const rows = [];
   let session = null;
+  let runEnd = Math.max(0, ...visits.map((v) => Date.parse(v.endedAt) || 0));
   const notes = [];
 
   for (const a of agents.agents || []) {
@@ -95,6 +96,7 @@ export async function cost(runDir) {
     }
     session ||= f;
     const u = usageOf(f.file);
+    if (u.last) runEnd = Math.max(runEnd, u.last);
     const s = sum(prices, u.messages);
     rows.push({agent: a.role + (a.identity ? ` (${a.identity})` : ''), role: a.role, model: s.model, job: a.job || '', minutes: u.first ? +((u.last - u.first) / 60000).toFixed(1) : 0, tokens: {input: s.input, cacheWrite: s.cacheWrite, cacheRead: s.cacheRead, output: s.output}, usd: s.usd});
   }
@@ -102,9 +104,10 @@ export async function cost(runDir) {
   if (session) {
     const main = path.join(session.project, `${session.session}.jsonl`);
     if (fs.existsSync(main)) {
-      const u = usageOf(main, {from});
+      // Only the run's own window (run start to the last agent or visit), so runs are comparable.
+      const u = usageOf(main, {from, to: runEnd || undefined});
       const s = sum(prices, u.messages);
-      rows.unshift({agent: 'orchestrator', role: 'orchestrator', model: s.model, job: 'plans the run, starts the agents', minutes: u.first ? +((u.last - u.first) / 60000).toFixed(1) : 0, tokens: {input: s.input, cacheWrite: s.cacheWrite, cacheRead: s.cacheRead, output: s.output}, usd: s.usd});
+      rows.unshift({agent: 'orchestrator (run window)', role: 'orchestrator', model: s.model, job: 'plans the run, starts the agents, writes the report', minutes: u.first ? +((u.last - u.first) / 60000).toFixed(1) : 0, tokens: {input: s.input, cacheWrite: s.cacheWrite, cacheRead: s.cacheRead, output: s.output}, usd: s.usd});
     } else notes.push('main session transcript not found');
   } else if (!(agents.agents || []).length) notes.push('no agents.json in the run: token cost not counted');
 
@@ -126,7 +129,7 @@ export async function cost(runDir) {
     pricesChecked: prices.checked,
     agents: rows,
     browser,
-    total: {tokensUsd, browserUsd: browser.usd, usd: +(tokensUsd + (browser.usd || 0)).toFixed(4), minutes: visits.length ? +((Math.max(...visits.map((v) => Date.parse(v.endedAt))) - from) / 60000).toFixed(1) : null},
+    total: {tokensUsd, browserUsd: browser.usd, usd: +(tokensUsd + (browser.usd || 0)).toFixed(4), minutes: runEnd ? +((runEnd - from) / 60000).toFixed(1) : null},
     notes,
   };
   writeJson(path.join(runDir, 'cost.json'), out);

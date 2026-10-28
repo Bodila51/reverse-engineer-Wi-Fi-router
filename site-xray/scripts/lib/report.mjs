@@ -92,7 +92,11 @@ ${[
   .map(([k, fn]) => `<tr><th>${esc(k)}</th>${people.map(([, p]) => `<td>${fn(p)}</td>`).join('')}</tr>`)
   .join('')}
 </table></div>
-${f.differences?.length ? `<p class="sub">Only some people were sent to: ${f.differences.slice(0, 12).map((d) => `<span class="chip">${esc(d.company)}: ${esc(d.seenBy.map((x) => f.people[x]?.label || x).join(', '))}</span>`).join(' ')}</p>` : ''}
+${(() => {
+  // Only companies that reached at most half of the people: the real differences.
+  const few = (f.differences || []).filter((d) => d.seenBy.length <= Math.max(1, Math.floor(people.length / 2))).slice(0, 10);
+  return few.length ? `<p class="sub">Sent to only some people: ${few.map((d) => `<span class="chip">${esc(d.company)}: ${esc(d.seenBy.map((x) => shortLabel(f.people[x]?.label || x)).join(', '))}</span>`).join(' ')}</p>` : '';
+})()}
 
 <h2>Companies that received data</h2>
 <div class="scroll"><table><tr><th>Company</th><th>What it does</th><th>HQ</th><th>What it received</th>${people.map(([id, p]) => `<th>${esc(shortLabel(p.label || id))}</th>`).join('')}</tr>
