@@ -142,7 +142,7 @@ export async function serve({url, identity, runDir, runId, watch, headless, reco
   let inflight = 0;
 
   // ---- browser
-  let browser, ctx, tmpDir, profileId;
+  let browser, ctx, tmpDir, profileId, lvBrowser, lvCdp;
   if (idn.mode === 'gologin') {
     const name = `site-xray-${identity}-${runId}`;
     profileId = await gl.createProfile({name, os: idn.os, country: idn.country, language: idn.language});
@@ -157,13 +157,33 @@ export async function serve({url, identity, runDir, runId, watch, headless, reco
     if (pf.status === 403) await giveUp(`Gologin refused the session (403): ${pf.reason || 'token or plan'}`);
     if (pf.status === 503) await giveUp(`Gologin is at the parallel-session limit (503): ${pf.reason || ''}. Wait for another visit to stop.`);
     if (pf.status !== 200) await giveUp(`Gologin's browser did not start within 2 minutes (${pf.status}: ${pf.reason || ''})`);
-    if (watch) {
+    // Live View must be asked for before the CDP connect (asked after, Gologin answers 403).
+    if (watch || record) {
       try {
-        cap.gologin.liveView = true;
         const lv = await gl.liveView(profileId);
-        if (lv) fs.writeFileSync(path.join(dir, 'liveview.url'), lv);
+        cap.gologin.liveView = !!lv;
+        if (lv && watch) fs.writeFileSync(path.join(dir, 'liveview.url'), lv);
+        if (lv && record) {
+          // Record the Live View page in a local headless browser. The link is never saved or printed.
+          lvBrowser = await chromium.launch({channel: 'chrome', headless: true});
+          const lvPage = await lvBrowser.newPage({viewport: {width: 1280, height: 800}});
+          await lvPage.goto(lv, {waitUntil: 'domcontentloaded', timeout: 45000});
+          fs.mkdirSync(path.join(dir, 'liveview'), {recursive: true});
+          cap.liveviewFrames = [];
+          lvCdp = await lvPage.context().newCDPSession(lvPage);
+          lvCdp.on('Page.screencastFrame', ({data, sessionId}) => {
+            const ms = t();
+            const name = `${String(ms).padStart(7, '0')}.jpg`;
+            try {
+              fs.writeFileSync(path.join(dir, 'liveview', name), Buffer.from(data, 'base64'));
+              cap.liveviewFrames.push({t: ms, file: `liveview/${name}`});
+            } catch {}
+            lvCdp.send('Page.screencastFrameAck', {sessionId}).catch(() => {});
+          });
+          await lvCdp.send('Page.startScreencast', {format: 'jpeg', quality: 80, maxWidth: 1280, maxHeight: 800, everyNthFrame: 2});
+        }
       } catch (e) {
-        cap.problems.push(`live view: ${redact(e.message)}`);
+        cap.problems.push(`live view: ${redact(e.message.split('\n')[0]).replace(/https?:\/\/\S+/g, '[link]')}`);
       }
     }
     browser = await chromium.connectOverCDP(gl.connectUrl(profileId), {timeout: 90000}).catch((e) => giveUp(`could not connect to Gologin's browser: ${redact(e.message.split('\n')[0])}`));
@@ -491,6 +511,8 @@ export async function serve({url, identity, runDir, runId, watch, headless, reco
     async stop() {
       setPhase('end');
       if (cdp) await cdp.send('Page.stopScreencast').catch(() => {});
+      if (lvCdp) await lvCdp.send('Page.stopScreencast').catch(() => {});
+      if (lvBrowser) await lvBrowser.close().catch(() => {});
       try {
         cap.cookies = await ctx.cookies();
       } catch (e) {
