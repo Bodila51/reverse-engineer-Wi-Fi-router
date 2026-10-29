@@ -147,17 +147,7 @@ export async function serve({url, identity, runDir, runId, watch, headless, reco
     const name = `site-xray-${identity}-${runId}`;
     profileId = await gl.createProfile({name, os: idn.os, country: idn.country, language: idn.language});
     cap.gologin = {profile: name, sessionStart: new Date().toISOString()};
-    const pf = await gl.preflight(profileId);
-    cap.gologin.preflight = pf.status;
-    const giveUp = async (msg) => {
-      await gl.endSession(profileId);
-      await gl.deleteProfile(profileId).catch(() => {});
-      throw new Error(msg);
-    };
-    if (pf.status === 403) await giveUp(`Gologin refused the session (403): ${pf.reason || 'token or plan'}`);
-    if (pf.status === 503) await giveUp(`Gologin is at the parallel-session limit (503): ${pf.reason || ''}. Wait for another visit to stop.`);
-    if (pf.status !== 200) await giveUp(`Gologin's browser did not start within 2 minutes (${pf.status}: ${pf.reason || ''})`);
-    // Live View must be asked for before the CDP connect (asked after, Gologin answers 403).
+    // Live View must be asked for before the preflight and the CDP connect (both start the session; asked after, Gologin answers 403 runByAnotherUser).
     if (watch || record) {
       try {
         const lv = await gl.liveView(profileId);
@@ -186,6 +176,16 @@ export async function serve({url, identity, runDir, runId, watch, headless, reco
         cap.problems.push(`live view: ${redact(e.message.split('\n')[0]).replace(/https?:\/\/\S+/g, '[link]')}`);
       }
     }
+    const pf = await gl.preflight(profileId);
+    cap.gologin.preflight = pf.status;
+    const giveUp = async (msg) => {
+      await gl.endSession(profileId);
+      await gl.deleteProfile(profileId).catch(() => {});
+      throw new Error(msg);
+    };
+    if (pf.status === 403) await giveUp(`Gologin refused the session (403): ${pf.reason || 'token or plan'}`);
+    if (pf.status === 503) await giveUp(`Gologin is at the parallel-session limit (503): ${pf.reason || ''}. Wait for another visit to stop.`);
+    if (pf.status !== 200) await giveUp(`Gologin's browser did not start within 2 minutes (${pf.status}: ${pf.reason || ''})`);
     browser = await chromium.connectOverCDP(gl.connectUrl(profileId), {timeout: 90000}).catch((e) => giveUp(`could not connect to Gologin's browser: ${redact(e.message.split('\n')[0])}`));
     ctx = browser.contexts()[0] ?? (await browser.newContext());
     // Which country the site will see. Only the country code is kept, never the IP.
